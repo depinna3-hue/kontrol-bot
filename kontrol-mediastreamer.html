@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kontrol Bot</title>
+<style>
+  * { box-sizing: border-box; }
+  body { font-family: sans-serif; font-size: 22px; line-height: 1.5; margin: 0; padding: 16px; background: #111; color: #fff; }
+  h1 { font-size: 30px; margin: 8px 0 4px; }
+  h2 { font-size: 26px; margin: 28px 0 8px; border-top: 2px solid #555; padding-top: 16px; }
+  h3 { font-size: 23px; margin: 18px 0 4px; color: #90caf9; }
+  p { margin: 8px 0; }
+  .kecil { font-size: 18px; color: #ccc; }
+  label { display: block; font-weight: bold; margin: 18px 0 6px; font-size: 22px; }
+  input { width: 100%; font-size: 22px; padding: 14px; border-radius: 10px; border: 2px solid #888; background: #222; color: #fff; }
+  button { display: block; width: 100%; font-size: 24px; font-weight: bold; padding: 18px 12px; margin: 12px 0; border-radius: 12px; border: none; cursor: pointer; }
+  button:disabled { opacity: 0.5; }
+  .btn-utama { background: #1e88e5; color: #fff; }
+  .btn-simpan { background: #2e7d32; color: #fff; }
+  .btn-berhenti { background: #c62828; color: #fff; }
+  .btn-nyala { background: #ef6c00; color: #fff; }
+  .btn-baca { background: #5e35b1; color: #fff; }
+  .btn-bot { background: #37474f; color: #fff; }
+  .btn-kuning { background: #f9a825; color: #000; }
+  .btn-teal { background: #00897b; color: #fff; }
+  .btn-perintah { background: #1565c0; color: #fff; text-align: left; }
+  .btn-salin { background: #2e7d32; color: #fff; }
+  .btn-kirim { background: #6a1b9a; color: #fff; }
+  #hasil, #hasilRobot { background: #222; border: 2px solid #1e88e5; border-radius: 10px; padding: 16px; margin: 16px 0; min-height: 70px; font-size: 22px; white-space: pre-line; }
+  #status { font-size: 26px; font-weight: bold; padding: 14px; border-radius: 10px; background: #222; border: 2px solid #888; margin: 10px 0; }
+  #infoBot { background: #222; border: 2px solid #555; border-radius: 10px; padding: 14px; margin: 10px 0; font-size: 20px; white-space: pre-line; }
+  #hasilProyek, #hasilBersih, #hasilCache, #hasilPerintah { background: #222; border: 2px solid #00897b; border-radius: 10px; padding: 14px; margin: 10px 0; font-size: 20px; white-space: pre-line; min-height: 60px; }
+  #salam { background: #0d2b45; border: 2px solid #1e88e5; border-radius: 12px; padding: 18px; font-size: 26px; font-weight: bold; margin: 12px 0; }
+  .kotak-baru { background: #123a3a; border: 3px solid #00c2a8; border-radius: 16px; padding: 16px; margin-bottom: 16px; }
+  .kotak-baru h2 { font-size: 24px; color: #7df0dd; margin: 0 0 8px; }
+  .kotak-baru ul { font-size: 22px; line-height: 1.5; margin: 0 0 12px; padding-left: 24px; }
+  .peringatan { background: #3d2c00; border: 2px solid #ffb300; border-radius: 10px; padding: 14px; font-size: 19px; }
+  .peringatan-merah { background: #4a0000; border: 2px solid #ef5350; border-radius: 10px; padding: 14px; font-size: 19px; }
+  .kotak-perhatian { background: #4a3600; border: 3px solid #ffb300; border-radius: 12px; padding: 18px; font-size: 22px; margin: 12px 0; }
+  .kotak-perhatian h2 { border-top: none; padding-top: 0; margin-top: 0; font-size: 28px; color: #ffd54f; }
+  .kotak-perhatian ul { margin: 8px 0; padding-left: 26px; }
+  .kotak-perhatian li { margin: 12px 0; }
+  #dialogTurun, #dialogOffline { position: fixed; left: 5%; right: 5%; top: 25%; background: #222; border: 3px solid #ef5350; border-radius: 12px; padding: 20px; z-index: 10; }
+  #dialogTurun p, #dialogOffline p { font-size: 24px; font-weight: bold; }
+  #perintahTerpilih { background: #1a1a2e; border: 2px solid #6a1b9a; border-radius: 10px; padding: 14px; margin: 10px 0; }
+</style>
+</head>
+<body>
+
+<div id="halamanUtama">
+<h1>Kontrol Bot</h1>
+<p class="kecil">Versi 3.3. Atur semua bot di Railway dari HP: Destri Nabila, Bela, Nadia Security, Nazipa Aurel, dan Player Publik. Bot harus tersambung internet. Aplikasi ini memperbarui diri otomatis saat dibuka.</p>
+
+<section id="salam" aria-live="polite">Assalamualaikum, Emon.</section>
+
+<section id="yangBaru" class="kotak-baru" role="region" aria-labelledby="judulBaru">
+<h2 id="judulBaru">Yang baru di versi 3.3</h2>
+<ul id="daftarBaru">
+<li>Aplikasi kini memperbarui diri otomatis saat dibuka — perubahan berikutnya muncul sendiri, tidak perlu APK baru.</li>
+<li>Daftar robot diperbaiki: Nazipa Aurel kini memakai perintah TTMediaBot, dan ada robot baru Player Publik untuk ruang tamu istana.</li>
+<li>Nadia Security sudah versi 1.8.0: mengenali suara Nisa walau ganti nama, dan hukuman untuk suara keras lebih ketat.</li>
+<li>Ada bunyi pembuka saat aplikasi dibuka, dan tiap robot punya bunyi sendiri saat halamannya dibuka.</li>
+</ul>
+<button class="btn-utama" id="tombolTutupBaru" type="button">Tutup</button>
+</section>
+
+<section class="kotak-perhatian" role="region" aria-labelledby="judulPerhatian" id="kotakPerhatian">
+<h2 id="judulPerhatian">PERHATIAN — Baca dulu sebelum menekan Turunkan atau Nyalakan</h2>
+<ul>
+<li>Setiap kali robot dinyalakan, Railway membuat deployment baru, dan itu memotong kredit sedikit setiap kali. Makin sering turun-naik, makin cepat kredit habis.</li>
+<li>Robot musik (Destri, Bela, Nazipa Aurel, Player Publik) sebaiknya dibiarkan NYALA terus. Menurunkan lalu menyalakan lagi justru boros.</li>
+<li>Turunkan robot hanya kalau perlu, misalnya saat perbaikan atau robot tidak dipakai lama.</li>
+<li>Menurunkan robot TIDAK menghapus robot dan TIDAK membebaskan slot proyek. Slot tetap terpakai. Menghapus robot baru membebaskan slot, tapi robot hilang dan harus dipasang dari awal.</li>
+<li>Saat robot turun, semua tugasnya ikut mati. Contoh: kalau Nadia Security turun, pengumuman sholat dan matikan musik jam 6 sore tidak jalan.</li>
+<li>Kredit trial: Token 1 sisa $4,55 sampai 18 Desember 2026; Token 2 sisa $4,52 sampai 22 Desember 2026. Setelah itu paket Free $1 per bulan, hanya 1 proyek, dan robot bisa tidur kalau 5 sampai 10 menit tidak ada trafik.</li>
+<li>Batas Railway: maksimal 25 service BARU per hari (reset jam 07.00 WIB). Menyalakan ulang robot yang sudah ada tidak dihitung sebagai service baru, tapi tetap memotong kredit.</li>
+</ul>
+</section>
+
+<h2>Tombol Cepat</h2>
+<button class="btn-kuning" id="tombolSemua" type="button" aria-label="Periksa status semua bot">Periksa Semua Bot</button>
+<div id="hasil" aria-live="polite" role="status">Membuka aplikasi. Sedang memeriksa internet...</div>
+<button class="btn-baca" id="tombolBaca" type="button" aria-label="Bacakan hasil">Bacakan hasil</button>
+
+<h2>Sisa Proyek dan Kredit Railway</h2>
+<p class="kecil">Cek berapa slot service yang tersisa di tiap proyek (maksimal 3 service per proyek) dan sisa kredit trial. Nilai kredit di bawah ini dicatat saat aplikasi dibuat, bukan angka live.</p>
+<div id="hasilProyek" aria-live="polite">Belum diperiksa.</div>
+<button class="btn-teal" id="tombolProyek" type="button">Cek Sisa Proyek</button>
+<div class="peringatan">Perhatian: setelah masa trial habis, paket Free hanya boleh 1 proyek. Token 1 (Sutrisna) sekarang punya 2 proyek, jadi nanti salah satunya harus digabung atau dihapus. Token 1: kredit sisa $4,55, trial habis Jumat 18 Desember 2026. Token 2: kredit sisa $4,52, trial habis Selasa 22 Desember 2026.</div>
+
+<h2>Pembersihan Otomatis Semua Robot Musik</h2>
+<p class="kecil">Semua robot musik harusnya punya pembersihan cache otomatis, kalau tidak server bisa macet karena cache menumpuk. Tombol ini memeriksa log tiap robot musik dan menghitung berapa yang sudah aktif.</p>
+<div id="hasilBersih" aria-live="polite">Belum diperiksa.</div>
+<button class="btn-teal" id="tombolBersih" type="button">Periksa Pembersihan</button>
+
+<h2>Pilih Bot</h2>
+<p class="kecil">Tekan nama bot untuk membuka halamannya. Di dalam halamannya hanya ada fitur bot itu saja: status, perintah, pengaturan, nyalakan dan matikan, dan cache (untuk bot musik).</p>
+<h3>Token 1 — Sutrisna (Istana Immortal dan Istana Ratu)</h3>
+<button class="btn-bot" id="tombolBot-destri" type="button" aria-label="Buka halaman bot Destri Nabila">Destri Nabila</button>
+<button class="btn-bot" id="tombolBot-bela" type="button" aria-label="Buka halaman bot Bela">Bela</button>
+<button class="btn-bot" id="tombolBot-nadiaSecurity" type="button" aria-label="Buka halaman bot Nadia Security">Nadia Security</button>
+<h3>Token 2 — Depinna (Istana Immortal)</h3>
+<button class="btn-bot" id="tombolBot-nazipa" type="button" aria-label="Buka halaman bot Nazipa Aurel">Nazipa Aurel</button>
+<button class="btn-bot" id="tombolBot-playerPublik" type="button" aria-label="Buka halaman bot Player Publik">Player Publik</button>
+
+<div class="peringatan">Perhatian: aplikasi ini menyimpan kunci Railway di penyimpanan pribadi HP. Jangan berikan aplikasi ini ke orang lain.</div>
+
+<h2>Keluar dari Aplikasi</h2>
+<button class="btn-berhenti" id="tombolKeluar" type="button">Keluar dari Aplikasi</button>
+<p class="kecil">Menutup aplikasi saja, bukan keluar akun. Pengaturan tetap tersimpan.</p>
+</div>
+
+<div id="halamanRobot" style="display:none">
+<h2>Robot: <span class="namaBot">Destri Nabila</span></h2>
+<div id="infoBot" aria-live="polite">Belum ada bot terpilih.</div>
+<button class="btn-utama" id="tombolKembali" type="button">Kembali ke daftar robot</button>
+<div id="hasilRobot" aria-live="polite" role="status">Belum ada hasil.</div>
+
+<h2>Status Bot: <span class="namaBot">Destri Nabila</span></h2>
+<div id="status" aria-live="polite">Belum diperiksa.</div>
+<button class="btn-utama" id="tombolStatus" type="button">Periksa Status</button>
+
+<h2>Perintah <span class="namaBot">Destri Nabila</span></h2>
+<p class="kecil">Tekan perintah untuk memilihnya, lalu tekan Salin perintah atau Kirim lewat Pengawas. Perintah admin di bawah ini langsung jalan tanpa menurunkan robot. Yang butuh restart hanya perubahan pengaturan koneksi (nama, server, channel).</p>
+<div id="panelPerintah"></div>
+<div id="perintahTerpilih" style="display:none">
+<p id="teksPerintahTerpilih" style="font-weight:bold"></p>
+<p class="kecil" id="catatanPerintah"></p>
+<button class="btn-salin" id="tombolSalin" type="button">Salin perintah</button>
+<button class="btn-kirim" id="tombolKirim" type="button">Kirim lewat Pengawas</button>
+<p class="kecil">Kirim lewat Pengawas: sekitar 1-2 menit, memotong kredit sedikit, lagu bisa putus-putus sebentar. Salin perintah: langsung, gratis, tanpa efek ke lagu.</p>
+</div>
+<div id="hasilPerintah" aria-live="polite">Belum ada perintah dikirim.</div>
+
+<h2>Pengaturan <span class="namaBot">Destri Nabila</span></h2>
+<p class="kecil">Ubah yang perlu saja, lalu tekan Simpan. Bot akan dimulai ulang otomatis setelah disimpan.</p>
+
+<label for="fNama">Nama bot (nama panggilan)</label>
+<input id="fNama" type="text" autocomplete="off" aria-label="Nama bot">
+
+<label for="fAkun">Nama akun TeamTalk</label>
+<input id="fAkun" type="text" autocomplete="off" aria-label="Nama akun TeamTalk">
+
+<label for="fHost">Alamat server TeamTalk</label>
+<input id="fHost" type="text" autocomplete="off" aria-label="Alamat server TeamTalk">
+
+<label for="fTcp">Port TCP</label>
+<input id="fTcp" type="number" inputmode="numeric" min="1" max="65535" aria-label="Port TCP">
+
+<label for="fUdp">Port UDP</label>
+<input id="fUdp" type="number" inputmode="numeric" min="1" max="65535" aria-label="Port UDP">
+
+<label for="fChannel">Channel</label>
+<input id="fChannel" type="text" autocomplete="off" aria-label="Channel">
+
+<label for="fPass">Kata sandi channel (boleh kosong)</label>
+<input id="fPass" type="text" autocomplete="off" aria-label="Kata sandi channel">
+
+<button class="btn-simpan" id="tombolSimpan" type="button">Simpan Pengaturan</button>
+
+<h2>Nyalakan dan Matikan <span class="namaBot">Destri Nabila</span></h2>
+<p class="kecil">Turunkan mematikan bot. Nyalakan menjalankan bot lagi. Tunggu sekitar 2 menit setelah menyalakan sampai bot masuk ke channel. Menekan Turunkan akan memunculkan konfirmasi dulu. Turunkan hanya kalau perlu — baca kotak PERHATIAN di halaman utama.</p>
+<button class="btn-berhenti" id="tombolTurun" type="button">Turunkan Bot (Matikan)</button>
+<button class="btn-nyala" id="tombolNyala" type="button">Nyalakan Bot</button>
+
+<div id="bagianCache">
+<h2>Cache <span class="namaBot">Destri Nabila</span></h2>
+<p class="kecil" id="teksCache">Pembersihan cache otomatis.</p>
+<div id="hasilCache" aria-live="polite">Belum diperiksa.</div>
+<button class="btn-teal" id="tombolCache" type="button">Cek Cache</button>
+</div>
+
+<button class="btn-utama" id="tombolKembaliBawah" type="button">Kembali ke daftar robot</button>
+</div>
+
+<div id="dialogTurun" role="alertdialog" aria-labelledby="dialogTurunPesan" style="display:none">
+<p id="dialogTurunPesan">Robot akan berhenti dan semua jadwalnya ikut mati. Turunkan hanya kalau perlu. Yakin mau menurunkan?</p>
+<button class="btn-berhenti" id="dialogTurunYa" type="button">Ya, Turunkan</button>
+<button class="btn-utama" id="dialogTurunBatal" type="button">Batal</button>
+</div>
+
+<div id="dialogOffline" role="alertdialog" aria-labelledby="dialogOfflinePesan" style="display:none">
+<p id="dialogOfflinePesan">Sayang sekali internetnya tidak aktif, silahkan nyalakan Wi-Fi atau data seluler.</p>
+<button class="btn-utama" id="dialogOfflineOk" type="button">OK</button>
+</div>
+
+<script>
+"use strict";
+var API = "https://backboard.railway.app/graphql/v2";
+
+// Token Railway TIDAK ada di halaman ini (baik yang dari internet
+// maupun yang bawaan di APK). Token disimpan di penyimpanan pribadi
+// HP dan diberikan ke halaman lewat bridge aplikasi (Android.getTokens).
+// Kalau bridge tidak ada (mis. dibuka di browser biasa), token kosong.
+function ambilTokenDariBridge() {
+  try {
+    if (typeof window !== "undefined" && window.Android && typeof window.Android.getTokens === "function") {
+      var t = JSON.parse(window.Android.getTokens());
+      if (t && t.token1 && t.token2) { return t; }
+    }
+  } catch (e) { /* diam */ }
+  return { token1: "", token2: "", ratuPassword: "" };
+}
+var TOKENS_BRIDGE = ambilTokenDariBridge();
+var TOKEN1 = TOKENS_BRIDGE.token1;
+var TOKEN2 = TOKENS_BRIDGE.token2;
+
+// Daftar bot yang bisa diatur (5 robot). Pengawas (checker) sengaja TIDAK
+// ada di sini: itu alat perbaikan, bukan robot Emon.
+var BOT_CONFIG = {
+  destri: {
+    nama: "Destri Nabila",
+    token: TOKEN1,
+    projectId: "3dc3f96a-4697-4e8a-ad33-717efdeb9e1a",
+    envId: "fc4ff8aa-4138-46bb-9f1c-1962700dbaea",
+    serviceId: "23823f71-7e16-472c-82da-10d0ce3ce4e9",
+    contohChannel: "/Ruang tamu istana/",
+    server: "Istana Immortal",
+    channel: "/Ruang tamu istana/",
+    versi: "MediaStreamer v1.5.6 (musik)",
+    jenis: "musik",
+    cacheJenis: "mediastreamer"
+  },
+  bela: {
+    nama: "Bela",
+    token: TOKEN1,
+    projectId: "3dc3f96a-4697-4e8a-ad33-717efdeb9e1a",
+    envId: "fc4ff8aa-4138-46bb-9f1c-1962700dbaea",
+    serviceId: "53f2eded-0197-4f90-a28c-33d0a4755cdf",
+    contohChannel: "/.Aula istana/",
+    server: "Istana Ratu",
+    channel: "/.Aula istana/",
+    versi: "MediaStreamer v1.5.6 (musik)",
+    jenis: "musik",
+    cacheJenis: "mediastreamer"
+  },
+  nadiaSecurity: {
+    nama: "Nadia Security",
+    token: TOKEN1,
+    projectId: "d26842ef-4819-46fc-8781-cc4cfb65afe1",
+    envId: "e1cbcc86-5be2-48ca-9217-9072f1cdba68",
+    serviceId: "b3a075c7-dcf4-453a-8466-780cf0cd82e2",
+    contohChannel: "/Ruang tamu istana/",
+    server: "Istana Immortal",
+    channel: "/Ruang tamu istana/",
+    versi: "v1.8.0 (penjaga, bukan musik)",
+    jenis: "penjaga",
+    cacheJenis: null
+  },
+  nazipa: {
+    nama: "Nazipa Aurel",
+    token: TOKEN2,
+    projectId: "80707a78-86db-4fa9-a488-de00d9fed65f",
+    envId: "083a302b-1943-4a22-a8c2-76e3804cc087",
+    serviceId: "ea6ae1b6-5f50-4434-8583-7765371e590c",
+    contohChannel: "/gudang bot/",
+    server: "Istana Immortal",
+    channel: "/gudang bot/",
+    versi: "v2.3.5 (musik, paling keras suaranya)",
+    jenis: "musik",
+    cacheJenis: "ttmediabot"
+  },
+  playerPublik: {
+    nama: "Player Publik",
+    token: TOKEN2,
+    projectId: "80707a78-86db-4fa9-a488-de00d9fed65f",
+    envId: "083a302b-1943-4a22-a8c2-76e3804cc087",
+    serviceId: "9f48a788-4375-40ba-8796-bfb39617e13f",
+    contohChannel: "/Ruang tamu istana/",
+    server: "Istana Immortal",
+    channel: "/Ruang tamu istana/",
+    versi: "MediaStreamer v1.5.6 (musik, publik)",
+    jenis: "musik",
+    cacheJenis: "mediastreamer"
+  }
+};
+
+// Proyek Railway (untuk Cek Sisa Proyek). Batas: 3 service per proyek.
+// Proyek nazipa berisi 3 service di Railway (Nazipa Aurel, Player Publik,
+// dan 1 service alat pemeriksa yang tidak ditampilkan di aplikasi ini).
+var PROJECT_CONFIG = [
+  { nama: "Nadia", id: "3dc3f96a-4697-4e8a-ad33-717efdeb9e1a", token: TOKEN1, akun: "Token 1 Sutrisna" },
+  { nama: "pemeriksa", id: "d26842ef-4819-46fc-8781-cc4cfb65afe1", token: TOKEN1, akun: "Token 1 Sutrisna" },
+  { nama: "nazipa", id: "80707a78-86db-4fa9-a488-de00d9fed65f", token: TOKEN2, akun: "Token 2 Depinna" }
+];
+
+// Status pembersihan cache per robot musik (dari pemeriksaan kode + log).
+// Destri/Bela/Player Publik: otomatis aktif (50 MB, tiap 5 menit).
+// Nazipa Aurel (mesin TTMediaBot): tidak ada cache disk (stream langsung).
+var CACHE_INFO = {
+  destri: { aktif: true, batas: "50 MB", ket: "Pembersihan otomatis AKTIF: batas 50 MB, cek tiap 5 menit, hanya file audio." },
+  bela: { aktif: true, batas: "50 MB", ket: "Pembersihan otomatis AKTIF: batas 50 MB, cek tiap 5 menit, hanya file audio." },
+  nazipa: { aktif: false, batas: "tidak ada", ket: "BELUM ada pembersihan otomatis: lagu distream langsung (FFmpeg), tidak diunduh, jadi tidak ada cache disk. Cache hanya daftar lagu terakhir, dihapus manual lewat perintah cc." },
+  playerPublik: { aktif: true, batas: "50 MB", ket: "Pembersihan otomatis AKTIF: batas 50 MB, cek tiap 5 menit, hanya file audio." }
+};
+
+// Perintah penting per robot (tanpa argumen). Perintah dikirim sebagai
+// pesan pribadi ke bot (tanpa garis miring), kecuali yang memang
+// perintah channel. "Nazipa Aurel" adalah mesin TTMediaBot, jadi
+// perintahnya ql/gl/r/cm. Daftar TTMediaBot diverifikasi dari kode bot
+// (bot/commands/__init__.py): h, s, n, b, ql, gl, r, cm. Perhatian:
+// "q" di TTMediaBot adalah perintah keluar (Quit), jadi TIDAK dipakai;
+// antrean di sana memakai "ql". Player Publik adalah MediaStreamer,
+// jadi perintahnya sama seperti Destri/Bela: h, s, n, b, q, ap, st.
+var PERINTAH = {
+  nadiaSecurity: [
+    { cmd: "h", label: "Bantuan" },
+    { cmd: "kata", label: "Status filter kata" },
+    { cmd: "kata on", label: "Nyalakan filter kata" },
+    { cmd: "kata off", label: "Matikan filter kata" },
+    { cmd: "jaga", label: "Status penjaga" },
+    { cmd: "jadwal", label: "Status jadwal" },
+    { cmd: "sambutan on", label: "Nyalakan sambutan" },
+    { cmd: "sambutan off", label: "Matikan sambutan" },
+    { cmd: "aichat on", label: "Nyalakan chat AI" },
+    { cmd: "aichat off", label: "Matikan chat AI" },
+    { cmd: "dengar on", label: "Nyalakan dengar (suara)" },
+    { cmd: "dengar off", label: "Matikan dengar (suara)" },
+    { cmd: "katakata", label: "Kata-kata hari ini" }
+  ],
+  destri: [
+    { cmd: "h", label: "Bantuan" },
+    { cmd: "s", label: "Berhenti" },
+    { cmd: "n", label: "Lagu berikutnya" },
+    { cmd: "b", label: "Lagu sebelumnya" },
+    { cmd: "q", label: "Lihat antrean" },
+    { cmd: "ap", label: "Autoplay on/off" },
+    { cmd: "st", label: "Status" }
+  ],
+  bela: [
+    { cmd: "h", label: "Bantuan" },
+    { cmd: "s", label: "Berhenti" },
+    { cmd: "n", label: "Lagu berikutnya" },
+    { cmd: "b", label: "Lagu sebelumnya" },
+    { cmd: "q", label: "Lihat antrean" },
+    { cmd: "ap", label: "Autoplay on/off" },
+    { cmd: "st", label: "Status" }
+  ],
+  nazipa: [
+    { cmd: "h", label: "Bantuan" },
+    { cmd: "s", label: "Berhenti" },
+    { cmd: "n", label: "Lagu berikutnya" },
+    { cmd: "b", label: "Lagu sebelumnya" },
+    { cmd: "ql", label: "Lihat antrean" },
+    { cmd: "gl", label: "Tautan lagu yang diputar" },
+    { cmd: "r", label: "Lagu terakhir" },
+    { cmd: "cm", label: "Pesan channel on/off (admin)" }
+  ],
+  playerPublik: [
+    { cmd: "h", label: "Bantuan" },
+    { cmd: "s", label: "Berhenti" },
+    { cmd: "n", label: "Lagu berikutnya" },
+    { cmd: "b", label: "Lagu sebelumnya" },
+    { cmd: "q", label: "Lihat antrean" },
+    { cmd: "ap", label: "Autoplay on/off" },
+    { cmd: "st", label: "Status" }
+  ]
+};
+
+// Service checker Pengawas (alat pemeriksa) — dipakai relay "Kirim lewat
+// Pengawas". Token 2, proyek nazipa. Bukan robot Emon, jadi tidak ada
+// di daftar bot di atas.
+var CHECKER = {
+  token: TOKEN2,
+  projectId: "80707a78-86db-4fa9-a488-de00d9fed65f",
+  envId: "083a302b-1943-4a22-a8c2-76e3804cc087",
+  serviceId: "76933820-a0bb-4de2-a9a4-1bb8ef65682b"
+};
+// Nickname yang dipakai relay saat mengirim perintah. BUKAN "Pengawas":
+// Nadia Security mengabaikan pesan pribadi dari nickname "Pengawas"
+// (daftar robot), jadi relay memakai "Kontrol". Akun yang dipakai tetap
+// akun admin yang sama.
+var RELAY_NICKNAME = "Kontrol";
+// Sandi akun Pengawas di Istana Ratu, dari bridge aplikasi (bukan dari
+// halaman ini). HANYA dipakai relay ke Bela di sini, jangan pernah
+// dicetak ke layar, log, atau chat.
+var RELAY_PASSWORD_RATU = TOKENS_BRIDGE.ratuPassword;
+
+var KUNCI_PILIHAN = "kontrolBotTerpilih";
+var PROBE_TIMEOUT_MS = 6000;
+var RELAY_POLL_MS = 5000;
+var RELAY_DEPLOY_POLL_MS = 2000;
+
+var elHasil = document.getElementById("hasil");
+var elHasilRobot = document.getElementById("hasilRobot");
+var elStatus = document.getElementById("status");
+var elInfoBot = document.getElementById("infoBot");
+var elHasilCache = document.getElementById("hasilCache");
+var elTeksCache = document.getElementById("teksCache");
+var elBagianCache = document.getElementById("bagianCache");
+var elHasilProyek = document.getElementById("hasilProyek");
+var elHasilBersih = document.getElementById("hasilBersih");
+var elDialogTurun = document.getElementById("dialogTurun");
+var elDialogTurunYa = document.getElementById("dialogTurunYa");
+var elDialogTurunBatal = document.getElementById("dialogTurunBatal");
+var elHalamanUtama = document.getElementById("halamanUtama");
+var elHalamanRobot = document.getElementById("halamanRobot");
+var elSalam = document.getElementById("salam");
+var elPanelPerintah = document.getElementById("panelPerintah");
+var elPerintahTerpilih = document.getElementById("perintahTerpilih");
+var elTeksPerintahTerpilih = document.getElementById("teksPerintahTerpilih");
+var elCatatanPerintah = document.getElementById("catatanPerintah");
+var elTombolSalin = document.getElementById("tombolSalin");
+var elTombolKirim = document.getElementById("tombolKirim");
+var elHasilPerintah = document.getElementById("hasilPerintah");
+var elDialogOffline = document.getElementById("dialogOffline");
+var elDialogOfflineOk = document.getElementById("dialogOfflineOk");
+elDialogTurun.style.display = "none";
+elDialogOffline.style.display = "none";
+elStatus.textContent = "Belum diperiksa.";
+var terakhirDeployId = null;
+var terakhirBerhenti = null;
+var deployIdPerBot = {};
+var perintahTerpilihSaatIni = null;
+var relayJalan = false;
+var relayDeployId = null;
+
+// ---------- Salam + tanggal/jam ----------
+var NAMA_HARI = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+var NAMA_BULAN = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+function teksSalam(d) {
+  var jam = d.getHours();
+  var ucapan = (jam >= 4 && jam < 11) ? "Selamat pagi" : (jam >= 11 && jam < 15) ? "Selamat siang" : (jam >= 15 && jam < 19) ? "Selamat sore" : "Selamat malam";
+  var hh = jam; if (hh < 10) { hh = "0" + hh; }
+  var mm = d.getMinutes(); if (mm < 10) { mm = "0" + mm; }
+  return "Assalamualaikum, Emon. " + ucapan + ". " + NAMA_HARI[d.getDay()] + ", " + d.getDate() + " " + NAMA_BULAN[d.getMonth()] + " " + d.getFullYear() + " jam " + hh + "." + mm + " WIB.";
+}
+function perbaruiSalam() {
+  if (elSalam) { elSalam.textContent = teksSalam(new Date()); }
+}
+
+// ---------- Navigasi halaman ----------
+function bacaPilihan() {
+  try {
+    var p = window.localStorage.getItem(KUNCI_PILIHAN);
+    if (p && BOT_CONFIG[p]) { return p; }
+  } catch (e) { /* localStorage tidak tersedia, pakai bawaan */ }
+  return "destri";
+}
+
+function simpanPilihan(id) {
+  try { window.localStorage.setItem(KUNCI_PILIHAN, id); } catch (e) { /* diam */ }
+}
+
+var botTerpilihId = bacaPilihan();
+var botTerpilih = BOT_CONFIG[botTerpilihId];
+
+function hasilAktif() {
+  return (elHalamanRobot.style.display !== "none") ? elHasilRobot : elHasil;
+}
+
+function umumkan(teks) {
+  hasilAktif().textContent = teks;
+}
+
+function baca(teks) {
+  try {
+    if (!("speechSynthesis" in window)) { umumkan("Pembaca suara tidak tersedia di HP ini. " + teks); return; }
+    window.speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(teks);
+    u.lang = "id-ID";
+    window.speechSynthesis.speak(u);
+  } catch (e) { /* diam */ }
+}
+
+function gql(token, query) {
+  return fetch(API, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+    body: JSON.stringify({ query: query })
+  }).then(function (r) {
+    if (!r.ok) { throw new Error("HTTP " + r.status); }
+    return r.json();
+  }).then(function (j) {
+    if (j.errors && j.errors.length) { throw new Error(j.errors[0].message || "Kesalahan Railway"); }
+    return j.data;
+  });
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, " ");
+}
+
+// Ubah waktu log (UTC) menjadi jam WIB yang mudah dibaca.
+function jamWib(iso) {
+  try {
+    var d = new Date(iso);
+    var w = new Date(d.getTime() + 7 * 60 * 60 * 1000);
+    var hh = w.getUTCHours(); if (hh < 10) { hh = "0" + hh; }
+    var mm = w.getUTCMinutes(); if (mm < 10) { mm = "0" + mm; }
+    return hh + "." + mm + " WIB";
+  } catch (e) { return ""; }
+}
+
+function teksStatusBot(nama, node) {
+  if (!node) { return nama + ": status tidak diketahui."; }
+  if (node.deploymentStopped) { return nama + " sudah dimatikan."; }
+  if (node.status === "SUCCESS") { return nama + " sedang berjalan."; }
+  if (node.status === "BUILDING" || node.status === "DEPLOYING" || node.status === "INITIALIZING") { return nama + " sedang dimulai, tunggu sebentar."; }
+  return "Status " + nama + ": " + node.status + ".";
+}
+
+function muatStatus() {
+  elStatus.textContent = "Sedang memeriksa...";
+  return gql(botTerpilih.token, 'query { service(id: "' + botTerpilih.serviceId + '") { deployments(first: 1) { edges { node { id status deploymentStopped } } } } }')
+    .then(function (d) {
+      var node = d.service && d.service.deployments && d.service.deployments.edges && d.service.deployments.edges[0] && d.service.deployments.edges[0].node;
+      if (node) { terakhirDeployId = node.id; terakhirBerhenti = !!node.deploymentStopped; deployIdPerBot[botTerpilihId] = node.id; }
+      elStatus.textContent = teksStatusBot(botTerpilih.nama, node);
+      return node;
+    })
+    .catch(function (e) {
+      elStatus.textContent = "Tidak bisa memeriksa status.";
+      throw e;
+    });
+}
+
+var FIELD = [
+  ["TT_NICKNAME", "fNama", "Nama bot"],
+  ["TT_USERNAME", "fAkun", "Nama akun"],
+  ["TT_HOST", "fHost", "Alamat server"],
+  ["TT_TCP_PORT", "fTcp", "Port TCP"],
+  ["TT_UDP_PORT", "fUdp", "Port UDP"],
+  ["TT_CHANNEL", "fChannel", "Channel"],
+  ["TT_CHANNEL_PASSWORD", "fPass", "Kata sandi channel"]
+];
+var nilaiAwal = {};
+
+function muatPengaturan() {
+  return gql(botTerpilih.token, 'query { variables(projectId: "' + botTerpilih.projectId + '", environmentId: "' + botTerpilih.envId + '", serviceId: "' + botTerpilih.serviceId + '") }')
+    .then(function (d) {
+      var v = d.variables || {};
+      FIELD.forEach(function (f) {
+        var el = document.getElementById(f[1]);
+        var val = v[f[0]] == null ? "" : String(v[f[0]]);
+        el.value = val;
+        nilaiAwal[f[0]] = val;
+      });
+    });
+}
+
+function muatSemua() {
+  umumkan("Sedang memuat status " + botTerpilih.nama + " dan pengaturan...");
+  muatStatus().then(function () { return muatPengaturan(); })
+    .then(function () { umumkan("Selesai dimuat. " + elStatus.textContent); })
+    .catch(function (e) {
+      umumkan("Tidak bisa terhubung ke Railway, periksa internet. " + (e && e.message ? e.message : ""));
+    });
+}
+
+function perbaruiDaftarBot() {
+  Object.keys(BOT_CONFIG).forEach(function (id) {
+    var btn = document.getElementById("tombolBot-" + id);
+    if (!btn) { return; }
+    btn.textContent = BOT_CONFIG[id].nama + (id === botTerpilihId ? " (terakhir dibuka)" : "");
+  });
+}
+
+function perbaruiHalamanRobot() {
+  var spans = document.querySelectorAll(".namaBot");
+  for (var i = 0; i < spans.length; i++) { spans[i].textContent = botTerpilih.nama; }
+  elInfoBot.textContent = botTerpilih.nama + "\nServer: " + botTerpilih.server + "\nChannel: " + botTerpilih.channel + "\nVersi: " + botTerpilih.versi;
+  if (botTerpilih.cacheJenis) {
+    elBagianCache.style.display = "";
+    var info = CACHE_INFO[botTerpilihId];
+    elTeksCache.textContent = info ? info.ket : "Pembersihan cache otomatis.";
+    elHasilCache.textContent = "Belum diperiksa. Tekan Cek Cache.";
+  } else {
+    elBagianCache.style.display = "none";
+  }
+  renderPanelPerintah();
+}
+
+function bukaHalamanRobot() {
+  elHalamanUtama.style.display = "none";
+  elHalamanRobot.style.display = "";
+  perbaruiHalamanRobot();
+  try { document.getElementById("tombolKembali").focus(); } catch (e) { /* diam */ }
+}
+
+function kembaliKeDaftar() {
+  elHalamanRobot.style.display = "none";
+  elHalamanUtama.style.display = "";
+  perbaruiDaftarBot();
+  try {
+    var btn = document.getElementById("tombolBot-" + botTerpilihId);
+    if (btn) { btn.focus(); }
+  } catch (e) { /* diam */ }
+}
+
+// Bunyi tiap robot (nama file di res/raw tanpa .mp3). Diputar sekali
+// saat halaman robot dibuka, lewat bridge aplikasi. Bunyi pembuka
+// aplikasi diputar oleh aplikasi sendiri, bukan dari sini.
+var BUNYI_ROBOT = { destri: "destri", bela: "bela", nadiaSecurity: "nadia", nazipa: "nazipa", playerPublik: "publik" };
+function bunyiRobot(id) {
+  try {
+    var nama = BUNYI_ROBOT[id];
+    if (nama && typeof window !== "undefined" && window.Android && typeof window.Android.playSound === "function") {
+      window.Android.playSound(nama);
+    }
+  } catch (e) { /* diam */ }
+}
+
+function pilihBot(id) {
+  if (!BOT_CONFIG[id]) { return; }
+  botTerpilihId = id;
+  botTerpilih = BOT_CONFIG[id];
+  simpanPilihan(id);
+  terakhirDeployId = null;
+  terakhirBerhenti = null;
+  bukaHalamanRobot();
+  bunyiRobot(id);
+  umumkan("Membuka halaman " + botTerpilih.nama + ". Sedang memuat...");
+  muatSemua();
+}
+
+function validasi() {
+  var host = document.getElementById("fHost").value.trim();
+  var tcp = document.getElementById("fTcp").value.trim();
+  var udp = document.getElementById("fUdp").value.trim();
+  var ch = document.getElementById("fChannel").value.trim();
+  var nama = document.getElementById("fNama").value.trim();
+  if (!nama) { return "Nama bot tidak boleh kosong."; }
+  if (!host) { return "Alamat server tidak boleh kosong."; }
+  var nTcp = Number(tcp), nUdp = Number(udp);
+  if (!tcp || isNaN(nTcp) || nTcp < 1 || nTcp > 65535 || String(nTcp) !== tcp) { return "Port TCP harus angka 1 sampai 65535."; }
+  if (!udp || isNaN(nUdp) || nUdp < 1 || nUdp > 65535 || String(nUdp) !== udp) { return "Port UDP harus angka 1 sampai 65535."; }
+  if (!ch || ch.charAt(0) !== "/") { return "Channel harus diawali garis miring, contoh " + botTerpilih.contohChannel + "."; }
+  return null;
+}
+
+function simpan() {
+  var salah = validasi();
+  if (salah) { umumkan(salah); baca(salah); return; }
+  var berubah = [];
+  FIELD.forEach(function (f) {
+    var val = document.getElementById(f[1]).value.trim();
+    if (val !== nilaiAwal[f[0]]) { berubah.push({ name: f[0], value: val, label: f[2] }); }
+  });
+  if (berubah.length === 0) { umumkan("Tidak ada yang berubah, tidak ada yang disimpan."); return; }
+  umumkan("Menyimpan " + berubah.length + " pengaturan " + botTerpilih.nama + ", tunggu sebentar...");
+  var rantai = Promise.resolve();
+  berubah.forEach(function (b) {
+    rantai = rantai.then(function () {
+      var q = 'mutation { variableUpsert(input: { projectId: "' + botTerpilih.projectId + '", environmentId: "' + botTerpilih.envId + '", serviceId: "' + botTerpilih.serviceId + '", name: "' + b.name + '", value: "' + esc(b.value) + '" }) }';
+      return gql(botTerpilih.token, q);
+    });
+  });
+  rantai.then(function () {
+    berubah.forEach(function (b) { nilaiAwal[b.name] = b.value; });
+    var teks = "Berhasil disimpan, " + botTerpilih.nama + " dimulai ulang. Tunggu sekitar 2 menit sampai bot masuk ke channel.";
+    umumkan(teks); baca(teks);
+  }).catch(function (e) {
+    var teks = "Gagal menyimpan. Tidak bisa terhubung ke Railway, periksa internet. " + (e && e.message ? e.message : "");
+    umumkan(teks); baca(teks);
+  });
+}
+
+function mintaKonfirmasiTurun() {
+  elDialogTurun.style.display = "";
+  try { elDialogTurunBatal.focus(); } catch (e) { /* diam */ }
+}
+
+function tutupDialogTurun() {
+  elDialogTurun.style.display = "none";
+}
+
+function turunkan() {
+  umumkan("Memeriksa status " + botTerpilih.nama + " dulu sebelum mematikan...");
+  muatStatus().then(function () {
+    if (terakhirBerhenti) { var t = botTerpilih.nama + " sudah dimatikan sebelumnya."; umumkan(t); baca(t); return; }
+    if (!terakhirDeployId) { var t2 = "Tidak bisa menemukan " + botTerpilih.nama + " yang sedang jalan."; umumkan(t2); baca(t2); return; }
+    umumkan("Mematikan " + botTerpilih.nama + ", tunggu sebentar...");
+    return gql(botTerpilih.token, 'mutation { deploymentStop(id: "' + terakhirDeployId + '") }').then(function () {
+      var teks = botTerpilih.nama + " sudah dimatikan.";
+      umumkan(teks); baca(teks);
+      return muatStatus();
+    });
+  }).catch(function (e) {
+    var teks = "Gagal mematikan " + botTerpilih.nama + ". Tidak bisa terhubung ke Railway, periksa internet.";
+    umumkan(teks); baca(teks);
+  });
+}
+
+function nyalakan() {
+  umumkan("Menyalakan " + botTerpilih.nama + ", tunggu sebentar...");
+  gql(botTerpilih.token, 'mutation { serviceInstanceRedeploy(environmentId: "' + botTerpilih.envId + '", serviceId: "' + botTerpilih.serviceId + '") }')
+    .then(function () {
+      var teks = botTerpilih.nama + " sedang dinyalakan. Tunggu sekitar 2 menit sampai bot masuk ke channel.";
+      umumkan(teks); baca(teks);
+      setTimeout(muatStatus, 30000);
+    })
+    .catch(function (e) {
+      var teks = "Gagal menyalakan " + botTerpilih.nama + ". Tidak bisa terhubung ke Railway, periksa internet.";
+      umumkan(teks); baca(teks);
+    });
+}
+
+// ---------- Periksa Semua Bot ----------
+function periksaSemua() {
+  umumkan("Memeriksa status semua bot, tunggu sebentar...");
+  var ids = Object.keys(BOT_CONFIG);
+  var hasil = [];
+  var rantai = Promise.resolve();
+  ids.forEach(function (id) {
+    rantai = rantai.then(function () {
+      var b = BOT_CONFIG[id];
+      return gql(b.token, 'query { service(id: "' + b.serviceId + '") { deployments(first: 1) { edges { node { id status deploymentStopped } } } } }')
+        .then(function (d) {
+          var node = d.service && d.service.deployments && d.service.deployments.edges && d.service.deployments.edges[0] && d.service.deployments.edges[0].node;
+          if (node) { deployIdPerBot[id] = node.id; }
+          hasil.push(teksStatusBot(b.nama, node));
+        })
+        .catch(function (e) {
+          hasil.push(b.nama + ": tidak bisa diperiksa, periksa internet.");
+        });
+    });
+  });
+  rantai.then(function () {
+    var teks = "Status semua bot:\n" + hasil.join("\n");
+    umumkan(teks); baca(teks);
+  });
+}
+
+// ---------- Cek Sisa Proyek ----------
+function cekProyek() {
+  elHasilProyek.textContent = "Sedang memeriksa proyek, tunggu sebentar...";
+  var baris = [];
+  var rantai = Promise.resolve();
+  PROJECT_CONFIG.forEach(function (p) {
+    rantai = rantai.then(function () {
+      return gql(p.token, 'query { project(id: "' + p.id + '") { name services { edges { node { id name } } } } }')
+        .then(function (d) {
+          var svcs = (d.project && d.project.services && d.project.services.edges) || [];
+          var jumlah = svcs.length;
+          var sisa = 3 - jumlah;
+          var nama = svcs.map(function (e) { return e.node.name; }).join(", ");
+          var t = "Proyek " + p.nama + " (" + p.akun + "): " + jumlah + "/3 service, sisa " + (sisa < 0 ? 0 : sisa) + " slot. Service: " + (nama || "-") + ".";
+          if (p.nama === "nazipa") { t += " (Termasuk 1 service alat pemeriksa yang tidak ditampilkan di aplikasi.)"; }
+          baris.push(t);
+        })
+        .catch(function (e) {
+          baris.push("Proyek " + p.nama + ": tidak bisa diperiksa, periksa internet.");
+        });
+    });
+  });
+  rantai.then(function () {
+    baris.push("Kredit trial (dicatat saat aplikasi dibuat): Token 1 Sutrisna sisa $4,55, habis Jumat 18 Desember 2026. Token 2 Depinna sisa $4,52, habis Selasa 22 Desember 2026.");
+    baris.push("Perhatian: setelah trial habis, paket Free hanya boleh 1 proyek. Token 1 sekarang punya 2 proyek.");
+    elHasilProyek.textContent = baris.join("\n");
+    baca(baris.join(". "));
+  });
+}
+
+// ---------- Cek Cache (bot musik terpilih) ----------
+function ambilLogCache(botId, filter, limit) {
+  var b = BOT_CONFIG[botId];
+  var depId = deployIdPerBot[botId] || terakhirDeployId;
+  if (!depId) {
+    return gql(b.token, 'query { service(id: "' + b.serviceId + '") { deployments(first: 1) { edges { node { id } } } } }')
+      .then(function (d) {
+        var node = d.service && d.service.deployments && d.service.deployments.edges && d.service.deployments.edges[0] && d.service.deployments.edges[0].node;
+        if (!node) { throw new Error("tidak ada deployment"); }
+        deployIdPerBot[botId] = node.id;
+        return node.id;
+      })
+      .then(function (id) {
+        return gql(b.token, 'query { deploymentLogs(deploymentId: "' + id + '", limit: ' + limit + ', filter: "' + esc(filter) + '") { message timestamp } }');
+      });
+  }
+  return gql(b.token, 'query { deploymentLogs(deploymentId: "' + depId + '", limit: ' + limit + ', filter: "' + esc(filter) + '") { message timestamp } }');
+}
+
+function cekCache() {
+  var jenis = botTerpilih.cacheJenis;
+  if (!jenis) { return; }
+  elHasilCache.textContent = "Sedang memeriksa cache " + botTerpilih.nama + ", tunggu sebentar...";
+  if (jenis === "mediastreamer") {
+    ambilLogCache(botTerpilihId, "Cache cleanup", 20)
+      .then(function (d) {
+        var logs = (d.deploymentLogs || []).slice();
+        if (!logs.length) {
+          elHasilCache.textContent = botTerpilih.nama + ": belum ada pembersihan di log. Cache masih di bawah 50 MB, atau log sudah berganti. Pembersihan otomatis AKTIF (batas 50 MB, cek tiap 5 menit).";
+          return;
+        }
+        var selesai = null;
+        for (var i = logs.length - 1; i >= 0; i--) {
+          if (logs[i].message.indexOf("selesai, cache audio sekarang") >= 0) { selesai = logs[i]; break; }
+        }
+        var teks = botTerpilih.nama + ": pembersihan otomatis AKTIF (batas 50 MB, cek tiap 5 menit).";
+        if (selesai) {
+          var m = selesai.message.match(/sekarang (\d+) MB/);
+          teks += "\nTerakhir dibersihkan " + jamWib(selesai.timestamp) + ", cache audio sekarang " + (m ? m[1] : "?") + " MB.";
+        } else {
+          teks += "\nBaris cache terakhir: " + logs[logs.length - 1].message + " (" + jamWib(logs[logs.length - 1].timestamp) + ").";
+        }
+        elHasilCache.textContent = teks;
+        baca(teks);
+      })
+      .catch(function (e) {
+        elHasilCache.textContent = "Tidak bisa memeriksa cache " + botTerpilih.nama + ". Periksa internet.";
+      });
+  } else if (jenis === "ttmediabot") {
+    ambilLogCache(botTerpilihId, "cache", 20)
+      .then(function (d) {
+        var logs = (d.deploymentLogs || []).slice();
+        var teks = botTerpilih.nama + ": BELUM ada pembersihan otomatis. Lagu distream langsung (FFmpeg), tidak diunduh, jadi tidak ada cache disk. Cache hanya daftar lagu terakhir, dihapus manual lewat perintah cc.";
+        if (logs.length) {
+          teks += "\nBaris cache terakhir: " + logs[logs.length - 1].message + " (" + jamWib(logs[logs.length - 1].timestamp) + ").";
+        } else {
+          teks += "\nTidak ada baris cache di log saat ini.";
+        }
+        elHasilCache.textContent = teks;
+        baca(teks);
+      })
+      .catch(function (e) {
+        elHasilCache.textContent = "Tidak bisa memeriksa cache " + botTerpilih.nama + ". Periksa internet.";
+      });
+  }
+}
+
+// ---------- Periksa Pembersihan (semua robot musik) ----------
+function periksaPembersihan() {
+  elHasilBersih.textContent = "Memeriksa pembersihan semua robot musik, tunggu sebentar...";
+  var musikIds = ["destri", "bela", "nazipa", "playerPublik"];
+  var hasil = [];
+  var aktif = 0;
+  var rantai = Promise.resolve();
+  musikIds.forEach(function (id) {
+    rantai = rantai.then(function () {
+      var b = BOT_CONFIG[id];
+      var info = CACHE_INFO[id];
+      var filter = (BOT_CONFIG[id].cacheJenis === "ttmediabot") ? "cache" : "Cache cleanup";
+      return ambilLogCache(id, filter, 20)
+        .then(function (d) {
+          var logs = (d.deploymentLogs || []).slice();
+          var baris;
+          if (info.aktif) {
+            aktif++;
+            if (logs.length) {
+              var selesai = null;
+              for (var i = logs.length - 1; i >= 0; i--) {
+                if (logs[i].message.indexOf("selesai, cache audio sekarang") >= 0) { selesai = logs[i]; break; }
+              }
+              baris = b.nama + ": AKTIF (batas " + info.batas + ", tiap 5 menit). Terbukti dari log" + (selesai ? ", terakhir " + jamWib(selesai.timestamp) + ", cache " + (selesai.message.match(/sekarang (\d+) MB/) || [null, "?"])[1] + " MB" : "") + ".";
+            } else {
+              baris = b.nama + ": AKTIF (batas " + info.batas + ", tiap 5 menit). Belum ada baris di log saat ini.";
+            }
+          } else {
+            baris = b.nama + ": BELUM AKTIF. " + info.ket;
+          }
+          hasil.push(baris);
+        })
+        .catch(function (e) {
+          hasil.push(b.nama + ": tidak bisa diperiksa lognya, periksa internet. Status dari kode: " + (info.aktif ? "AKTIF" : "BELUM AKTIF") + ".");
+          if (info.aktif) { aktif++; }
+        });
+    });
+  });
+  rantai.then(function () {
+    var ringkas = "Pembersihan otomatis: " + aktif + " dari 4 robot musik aktif, " + (4 - aktif) + " belum aktif.";
+    if (aktif < 4) {
+      ringkas += "\nPerhatian: robot yang belum aktif pembersihannya bisa menumpuk cache dan membuat server macet. Perlu dipasang pembersihan otomatis (minta Luna, jangan langsung diubah sendiri).";
+    }
+    elHasilBersih.textContent = ringkas + "\n" + hasil.join("\n");
+    baca(ringkas);
+  });
+}
+
+// ---------- Panel Perintah ----------
+function renderPanelPerintah() {
+  elPanelPerintah.innerHTML = "";
+  perintahTerpilihSaatIni = null;
+  elPerintahTerpilih.style.display = "none";
+  elHasilPerintah.textContent = "Belum ada perintah dikirim.";
+  var daftar = PERINTAH[botTerpilihId] || [];
+  daftar.forEach(function (p) {
+    var btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "btn-perintah";
+    btn.textContent = p.label + " (" + p.cmd + ")";
+    btn.setAttribute("aria-label", p.label + ", perintah " + p.cmd);
+    btn.addEventListener("click", function () { tampilkanPerintah(p.cmd, p.label); });
+    elPanelPerintah.appendChild(btn);
+  });
+}
+
+function tampilkanPerintah(cmd, label) {
+  perintahTerpilihSaatIni = { cmd: cmd, label: label };
+  elTeksPerintahTerpilih.textContent = "Perintah: " + cmd + " — " + label;
+  var catatan = "";
+  if (botTerpilih.jenis === "musik") {
+    catatan = "Dikirim sebagai pesan pribadi ke bot (tanpa garis miring).";
+  } else {
+    catatan = "Perintah admin, dikirim sebagai pesan pribadi ke bot.";
+  }
+  elCatatanPerintah.textContent = catatan;
+  elPerintahTerpilih.style.display = "";
+  elTombolKirim.disabled = false;
+  elTombolKirim.textContent = "Kirim lewat Pengawas";
+  elHasilPerintah.textContent = "Pilih Salin perintah atau Kirim lewat Pengawas.";
+  try { elTombolSalin.focus(); } catch (e) { /* diam */ }
+}
+
+function salinPerintah() {
+  if (!perintahTerpilihSaatIni) { return; }
+  var teks = perintahTerpilihSaatIni.cmd;
+  function ok() {
+    elHasilPerintah.textContent = "Perintah disalin: " + teks + ". Tempel di TeamTalk untuk mengirimnya ke " + botTerpilih.nama + ".";
+    baca(elHasilPerintah.textContent);
+  }
+  function gagal() {
+    elHasilPerintah.textContent = "Tidak bisa menyalin otomatis di HP ini. Salin manual: " + teks;
+    baca(elHasilPerintah.textContent);
+  }
+  try {
+    if (typeof navigator !== "undefined" && navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(teks).then(ok, gagal);
+      return;
+    }
+    var ta = document.createElement("textarea");
+    ta.value = teks;
+    document.body.appendChild(ta);
+    ta.select();
+    var berhasil = false;
+    try { berhasil = document.execCommand("copy"); } catch (e) { berhasil = false; }
+    document.body.removeChild(ta);
+    if (berhasil) { ok(); } else { gagal(); }
+  } catch (e) { gagal(); }
+}
+
+// ---------- Relay "Kirim lewat Pengawas" ----------
+// Aplikasi tidak bisa bicara TeamTalk langsung, jadi perintah dikirim
+// lewat service checker Pengawas (mode pmkirim): aplikasi mengatur
+// variabel checker (skipDeploys, tanpa deployment per variabel),
+// menyalakan checker sekali, memantau log sampai balasan bot muncul,
+// lalu mengembalikan variabel checker ke keadaan semula dan mematikan
+// checker. Variabel checker yang lama dibaca dulu dan disimpan, jadi
+// pemulihan mengembalikan persis keadaan semula (termasuk sandi lama,
+// yang tidak pernah ditampilkan).
+function relayUpsert(nama, nilai) {
+  var q = 'mutation { variableUpsert(input: { projectId: "' + CHECKER.projectId + '", environmentId: "' + CHECKER.envId + '", serviceId: "' + CHECKER.serviceId + '", name: "' + nama + '", value: "' + esc(nilai) + '", skipDeploys: true }) }';
+  return gql(CHECKER.token, q);
+}
+function relayDeleteVar(nama) {
+  var q = 'mutation { variableDelete(input: { projectId: "' + CHECKER.projectId + '", environmentId: "' + CHECKER.envId + '", serviceId: "' + CHECKER.serviceId + '", name: "' + nama + '" }) }';
+  return gql(CHECKER.token, q);
+}
+function relayBacaVariabel() {
+  return gql(CHECKER.token, 'query { variables(projectId: "' + CHECKER.projectId + '", environmentId: "' + CHECKER.envId + '", serviceId: "' + CHECKER.serviceId + '") }').then(function (d) { return d.variables || {}; });
+}
+function relayStatusChecker() {
+  return gql(CHECKER.token, 'query { service(id: "' + CHECKER.serviceId + '") { deployments(first: 1) { edges { node { id status deploymentStopped } } } } }').then(function (d) {
+    var node = d.service && d.service.deployments && d.service.deployments.edges && d.service.deployments.edges[0] && d.service.deployments.edges[0].node;
+    return node || null;
+  });
+}
+function relayMulaiUlang() {
+  return gql(CHECKER.token, 'mutation { serviceInstanceRedeploy(environmentId: "' + CHECKER.envId + '", serviceId: "' + CHECKER.serviceId + '") }').then(function () { return true; });
+}
+function relayTungguDeployBaru(idLama) {
+  var mulai = Date.now();
+  function cek() {
+    return relayStatusChecker().then(function (node) {
+      if (node && node.id && node.id !== idLama) { return node.id; }
+      if (Date.now() - mulai > 30000) { return node ? node.id : null; }
+      return new Promise(function (res) { setTimeout(function () { res(cek()); }, RELAY_DEPLOY_POLL_MS); });
+    });
+  }
+  return cek();
+}
+function relayAmbilLog(deployId, filter, limit) {
+  return gql(CHECKER.token, 'query { deploymentLogs(deploymentId: "' + deployId + '", limit: ' + limit + ', filter: "' + esc(filter) + '") { message timestamp } }').then(function (d) { return d.deploymentLogs || []; });
+}
+function relayTungguBalasan(deployId) {
+  var mulai = Date.now();
+  var balasan = [];
+  function satuPutaran() {
+    if (Date.now() - mulai > 120000) { return Promise.resolve({ balasan: balasan, hasil: "waktu habis" }); }
+    return relayAmbilLog(deployId, "BALASAN_TARGET", 50).then(function (logs) {
+      logs.forEach(function (l) {
+        var isi = l.message.replace("BALASAN_TARGET isi=", "");
+        if (balasan.indexOf(isi) < 0) { balasan.push(isi); }
+      });
+      return relayAmbilLog(deployId, "HASIL", 10);
+    }).then(function (logs) {
+      for (var i = 0; i < logs.length; i++) {
+        if (logs[i].message.indexOf("HASIL: ADA BALASAN") >= 0) { return { balasan: balasan, hasil: "ada" }; }
+        if (logs[i].message.indexOf("HASIL: TIDAK ADA BALASAN") >= 0) { return { balasan: balasan, hasil: "tidak" }; }
+        // Baris HASIL lain = gagal sebelum mengirim (checker selalu
+        // mencetak tepat satu baris HASIL, mis. "HASIL: ERROR target
+        // ... tidak ada di server."). Jangan pakai filter "ERROR":
+        // filter log Railway tidak peka huruf besar/kecil, jadi
+        // "ERROR" cocok dengan noise ALSA ("error evaluating ...")
+        // dan relay salah mengira gagal padahal checker baru mulai.
+        if (logs[i].message.indexOf("HASIL:") === 0) { return { balasan: balasan, hasil: "error", pesan: logs[i].message.replace("HASIL: ", "") }; }
+      }
+      return new Promise(function (res) { setTimeout(function () { res(satuPutaran()); }, RELAY_POLL_MS); });
+    });
+  }
+  return satuPutaran();
+}
+function relayPulihkan(simpan) {
+  if (!simpan) { return Promise.resolve(); }
+  var rantai = Promise.resolve();
+  // 1. CHECK_MODE=list dulu (tanpa deploy) supaya pemulihan tidak
+  // memicu jalan dengan variabel yang belum lengkap.
+  rantai = rantai.then(function () { return relayUpsert("CHECK_MODE", "list"); });
+  // 2. Kembalikan variabel yang tadi disimpan (kecuali CHECK_MODE,
+  // yang dikembalikan di langkah 4).
+  ["TT_SERVER", "TT_USERNAME", "TT_PASSWORD", "TT_NICKNAME", "TT_CHANNEL", "TT_CHANNEL_PASSWORD"].forEach(function (n) {
+    rantai = rantai.then(function () {
+      if (simpan[n] == null) {
+        if (n === "TT_SERVER") { return relayDeleteVar("TT_SERVER"); }
+        return Promise.resolve();
+      }
+      return relayUpsert(n, String(simpan[n]));
+    });
+  });
+  // 3. Hapus variabel relay yang tidak ada sebelumnya.
+  ["PMKIRIM_TARGET", "PMKIRIM_TEXT", "PMKIRIM_WAIT"].forEach(function (n) {
+    rantai = rantai.then(function () {
+      if (simpan[n] == null) { return relayDeleteVar(n); }
+      return Promise.resolve();
+    });
+  });
+  // 4. Kembalikan CHECK_MODE semula (baseline: pmcek) tanpa deploy.
+  rantai = rantai.then(function () {
+    var mode = (simpan.CHECK_MODE == null ? "pmcek" : String(simpan.CHECK_MODE));
+    return relayUpsert("CHECK_MODE", mode);
+  });
+  // 5. Matikan deployment relay kalau masih jalan (biasanya sudah
+  // keluar sendiri; gagal di sini diabaikan).
+  rantai = rantai.then(function () {
+    if (!relayDeployId) { return Promise.resolve(); }
+    return gql(CHECKER.token, 'mutation { deploymentStop(id: "' + relayDeployId + '") }').catch(function () { return null; });
+  });
+  return rantai.catch(function () { return null; });
+}
+function kirimLewatPengawas() {
+  if (!perintahTerpilihSaatIni) { return Promise.resolve(); }
+  if (relayJalan) {
+    elHasilPerintah.textContent = "Pengawas sedang bekerja, tunggu sebentar.";
+    return Promise.resolve();
+  }
+  var cmd = perintahTerpilihSaatIni.cmd;
+  var target = botTerpilih.nama;
+  var ratu = (botTerpilihId === "bela");
+  relayJalan = true;
+  elTombolKirim.disabled = true;
+  elTombolKirim.textContent = "Pengawas sedang bekerja...";
+  elHasilPerintah.textContent = "Mengirim \"" + cmd + "\" ke " + target + " lewat Pengawas. Tunggu sekitar 1-2 menit...";
+  var simpan = null;
+  var idLama = null;
+  return relayStatusChecker().then(function (node) {
+    if (node && (node.status === "BUILDING" || node.status === "DEPLOYING" || node.status === "INITIALIZING")) {
+      throw new Error("sibuk");
+    }
+    if (node) { idLama = node.id; }
+    return relayBacaVariabel();
+  }).then(function (vars) {
+    simpan = vars;
+    var rantai = Promise.resolve();
+    var atur = [
+      ["TT_SERVER", ratu ? "ratu" : "immortal"],
+      ["TT_USERNAME", ratu ? "Pengawas" : "Nadia"],
+      ["TT_PASSWORD", ratu ? RELAY_PASSWORD_RATU : (vars.TT_PASSWORD == null ? "" : String(vars.TT_PASSWORD))],
+      ["TT_NICKNAME", RELAY_NICKNAME],
+      ["TT_CHANNEL", botTerpilih.channel],
+      ["TT_CHANNEL_PASSWORD", botTerpilih.channel === "/gudang bot/" ? "12" : ""],
+      ["PMKIRIM_TARGET", target],
+      ["PMKIRIM_TEXT", cmd],
+      ["PMKIRIM_WAIT", "60"],
+      ["CHECK_MODE", "pmkirim"]
+    ];
+    atur.forEach(function (pas) {
+      rantai = rantai.then(function () { return relayUpsert(pas[0], pas[1]); });
+    });
+    return rantai;
+  }).then(function () {
+    return relayMulaiUlang();
+  }).then(function () {
+    return relayTungguDeployBaru(idLama);
+  }).then(function (deployId) {
+    relayDeployId = deployId;
+    if (!deployId) { throw new Error("tidak ada deployment"); }
+    return relayTungguBalasan(deployId);
+  }).then(function (hasil) {
+    if (hasil.hasil === "ada" && hasil.balasan.length) {
+      elHasilPerintah.textContent = "Balasan " + target + " untuk \"" + cmd + "\":\n" + hasil.balasan.join("\n");
+    } else if (hasil.hasil === "tidak") {
+      elHasilPerintah.textContent = target + " tidak membalas \"" + cmd + "\". Bot mungkin sedang mati atau tidak ada di server.";
+    } else if (hasil.hasil === "error") {
+      elHasilPerintah.textContent = "Gagal mengirim: " + (hasil.pesan || "target tidak ditemukan di server.");
+    } else {
+      elHasilPerintah.textContent = "Waktu habis (2 menit). " + target + " belum membalas \"" + cmd + "\".";
+    }
+    baca(elHasilPerintah.textContent);
+  }).catch(function (e) {
+    if (e && e.message === "sibuk") {
+      elHasilPerintah.textContent = "Pengawas sedang bekerja, tunggu sebentar.";
+    } else {
+      elHasilPerintah.textContent = "Gagal mengirim lewat Pengawas. Tidak bisa terhubung ke Railway, periksa internet.";
+    }
+    baca(elHasilPerintah.textContent);
+  }).then(function () {
+    return relayPulihkan(simpan);
+  }).then(function () {
+    relayJalan = false;
+    relayDeployId = null;
+    elTombolKirim.disabled = false;
+    elTombolKirim.textContent = "Kirim lewat Pengawas";
+  });
+}
+
+// ---------- Keluar dari Aplikasi ----------
+// Menutup aplikasi saja, BUKAN keluar akun. Token Railway dan semua
+// pengaturan tetap tersimpan di aplikasi, jadi saat dibuka lagi
+// langsung bisa dipakai tanpa login ulang. Tidak menghapus data apa pun.
+function tutupAplikasi() {
+  try {
+    if (typeof window !== "undefined" && window.Android && typeof window.Android.exitApp === "function") {
+      window.Android.exitApp();
+      return true;
+    }
+  } catch (e) { /* diam */ }
+  return false;
+}
+
+// ---------- Deteksi internet saat dibuka ----------
+// Kalau tidak ada internet saat aplikasi dibuka, tampilkan dialog dan
+// setelah OK, aplikasi keluar. Kalau internet putus di tengah pakai,
+// tidak dipaksa keluar — cukup cek saat dibuka.
+function tampilkanDialogOffline() {
+  elDialogOffline.style.display = "";
+  try { elDialogOfflineOk.focus(); } catch (e) { /* diam */ }
+}
+function cekInternet() {
+  try {
+    if (typeof navigator !== "undefined" && navigator.onLine === false) { return Promise.resolve(false); }
+  } catch (e) { /* lanjut ke probe */ }
+  var timeout = new Promise(function (res) { setTimeout(function () { res("timeout"); }, PROBE_TIMEOUT_MS); });
+  var probe = gql(TOKEN1, 'query { service(id: "23823f71-7e16-472c-82da-10d0ce3ce4e9") { id } }')
+    .then(function () { return true; })
+    .catch(function () { return false; });
+  return Promise.race([probe, timeout]).then(function (hasil) { return hasil === true; });
+}
+
+document.getElementById("tombolBot-destri").addEventListener("click", function () { pilihBot("destri"); });
+document.getElementById("tombolBot-bela").addEventListener("click", function () { pilihBot("bela"); });
+document.getElementById("tombolBot-nadiaSecurity").addEventListener("click", function () { pilihBot("nadiaSecurity"); });
+document.getElementById("tombolBot-nazipa").addEventListener("click", function () { pilihBot("nazipa"); });
+document.getElementById("tombolBot-playerPublik").addEventListener("click", function () { pilihBot("playerPublik"); });
+document.getElementById("tombolKembali").addEventListener("click", kembaliKeDaftar);
+document.getElementById("tombolKembaliBawah").addEventListener("click", kembaliKeDaftar);
+document.getElementById("tombolSemua").addEventListener("click", periksaSemua);
+document.getElementById("tombolStatus").addEventListener("click", function () {
+  muatStatus().then(function () { var t = elStatus.textContent; umumkan(t); baca(t); })
+    .catch(function () { var t = "Tidak bisa terhubung ke Railway, periksa internet."; umumkan(t); baca(t); });
+});
+document.getElementById("tombolSimpan").addEventListener("click", simpan);
+document.getElementById("tombolTurun").addEventListener("click", mintaKonfirmasiTurun);
+document.getElementById("dialogTurunYa").addEventListener("click", function () { tutupDialogTurun(); turunkan(); });
+document.getElementById("dialogTurunBatal").addEventListener("click", function () { tutupDialogTurun(); var t = "Dibatalkan, " + botTerpilih.nama + " tetap berjalan."; umumkan(t); });
+document.getElementById("tombolNyala").addEventListener("click", nyalakan);
+document.getElementById("tombolBaca").addEventListener("click", function () { baca(hasilAktif().textContent); });
+document.getElementById("tombolCache").addEventListener("click", cekCache);
+document.getElementById("tombolProyek").addEventListener("click", cekProyek);
+document.getElementById("tombolBersih").addEventListener("click", periksaPembersihan);
+document.getElementById("tombolSalin").addEventListener("click", salinPerintah);
+document.getElementById("tombolKirim").addEventListener("click", kirimLewatPengawas);
+document.getElementById("tombolKeluar").addEventListener("click", function () {
+  if (!tutupAplikasi()) {
+    umumkan("Tidak bisa menutup otomatis di sini. Tutup aplikasi secara manual.");
+  }
+});
+elDialogOfflineOk.addEventListener("click", function () {
+  elDialogOffline.style.display = "none";
+  if (!tutupAplikasi()) {
+    umumkan("Tidak bisa menutup otomatis di sini. Tutup aplikasi secara manual.");
+  }
+});
+
+// Artikel "Yang baru di versi ini" — ikut ter-update lewat halaman
+// internet (bagian dari konten remote). Tombol Tutup menyembunyikan
+// artikel sampai ada versi baru.
+var VERSI_APLIKASI = "3.3";
+function siapkanArtikelBaru() {
+  var kotak = document.getElementById("yangBaru");
+  var tombol = document.getElementById("tombolTutupBaru");
+  if (!kotak || !tombol) { return; }
+  try {
+    if (window.localStorage && window.localStorage.getItem("kontrolBotYangBaruDitutup") === VERSI_APLIKASI) {
+      kotak.style.display = "none";
+      return;
+    }
+  } catch (e) { /* diam */ }
+  tombol.addEventListener("click", function () {
+    kotak.style.display = "none";
+    try {
+      if (window.localStorage) { window.localStorage.setItem("kontrolBotYangBaruDitutup", VERSI_APLIKASI); }
+    } catch (e) { /* diam */ }
+  });
+}
+
+perbaruiSalam();
+setInterval(perbaruiSalam, 60000);
+perbaruiDaftarBot();
+perbaruiHalamanRobot();
+siapkanArtikelBaru();
+cekInternet().then(function (online) {
+  if (!online) { tampilkanDialogOffline(); return; }
+  muatSemua();
+});
+</script>
+</body>
+</html>
