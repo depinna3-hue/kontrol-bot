@@ -1184,14 +1184,19 @@ elDialogOfflineOk.addEventListener("click", function () {
 
 // Artikel "Yang baru di versi ini" — ikut ter-update lewat halaman
 // internet (bagian dari konten remote). Tombol Tutup menyembunyikan
-// artikel sampai ada versi baru.
+// artikel sampai ada revisi artikel baru.
+// PENTING: setiap kali teks artikel diubah, naikkan REVISI_ARTIKEL
+// (mis. "3.3-2" -> "3.3-3") supaya artikel muncul lagi walau pengguna
+// sudah menutupnya di revisi sebelumnya. Versi aplikasi TIDAK naik
+// untuk perubahan isi halaman.
 var VERSI_APLIKASI = "3.3";
+var REVISI_ARTIKEL = "3.3-2";
 function siapkanArtikelBaru() {
   var kotak = document.getElementById("yangBaru");
   var tombol = document.getElementById("tombolTutupBaru");
   if (!kotak || !tombol) { return; }
   try {
-    if (window.localStorage && window.localStorage.getItem("kontrolBotYangBaruDitutup") === VERSI_APLIKASI) {
+    if (window.localStorage && window.localStorage.getItem("kontrolBotYangBaruDitutup") === REVISI_ARTIKEL) {
       kotak.style.display = "none";
       return;
     }
@@ -1199,7 +1204,7 @@ function siapkanArtikelBaru() {
   tombol.addEventListener("click", function () {
     kotak.style.display = "none";
     try {
-      if (window.localStorage) { window.localStorage.setItem("kontrolBotYangBaruDitutup", VERSI_APLIKASI); }
+      if (window.localStorage) { window.localStorage.setItem("kontrolBotYangBaruDitutup", REVISI_ARTIKEL); }
     } catch (e) { /* diam */ }
   });
 }
